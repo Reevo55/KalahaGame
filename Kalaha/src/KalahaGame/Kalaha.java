@@ -3,6 +3,8 @@ package KalahaGame;
 import Constants.Constants;
 import com.sun.xml.internal.ws.wsdl.writer.document.http.Address;
 
+import java.util.ArrayList;
+
 public class Kalaha{
     private int kalahaBoardSize = 12;
     private int startingValues = 5;
@@ -54,7 +56,20 @@ public class Kalaha{
 
         return disposeRocks(rocks, offSet + 1); // przyporządkowanie kamieni
     }
+    public int checkIfMoveIsValid(int offSet)
+    {
+        if(offSet < 0 || offSet > this.sizeOfPlayerBoard) return Constants.ERROR; // sprawdzenie czy nie błedne
 
+        if(whichPlayerTurn == Constants.FIRST_PLAYER_TURN)
+            offSet = offSet; // offset pozostaje taki sam
+        else offSet = offSet + this.sizeOfPlayerBoard + 1; // Ustawia move na planszy drugiego gracza
+
+        if(isFinished()) return finishGame();
+
+        if(board[offSet] == 0 || isItPointPit(offSet)) return Constants.ERROR; // kolejne sprawdzenie
+
+        return Constants.NO_ERROR;
+    }
     private int finishGame() {
         int sum = 0;
 
@@ -63,6 +78,7 @@ public class Kalaha{
             for(int i=0; i < this.sizeOfPlayerBoard; i++)
             {
                 sum += board[i];
+                board[i] = 0;
             }
             board[firstScorePotOffset] += sum;
         } else
@@ -70,6 +86,7 @@ public class Kalaha{
             for(int i = this.sizeOfPlayerBoard + 1; i < this.kalahaBoardSize - 1; i++)
             {
                 sum += board[i];
+                board[i] = 0;
             }
             board[secondScorePotOffset] += sum;
         }
@@ -108,14 +125,17 @@ public class Kalaha{
         {
             if(potNr(offSet) == firstScorePotOffset) // jesli ostatni kamyk wlecial do scora gracza wykonujacego ruch, powtarza on ruch
             {
-                whichPlayerTurn = whichPlayerTurn;
+                whichPlayerTurn = whichPlayerTurn; // tura pozostaje tego samego gracza
             }
             else if(potNr(offSet) < this.sizeOfPlayerBoard && board[potNr(offSet)] == 1) //oprogramowanie zbicia
             {
                 int otherSidePitHole = kalahaBoardSize - 2 - potNr(offSet);
                 int temp = board[otherSidePitHole];
                 board[otherSidePitHole] = 0;
-                board[firstScorePotOffset] = temp;
+                board[firstScorePotOffset] += temp;
+                board[firstScorePotOffset] += board[potNr(offSet)];
+                board[potNr(offSet)] = 0;
+                whichPlayerTurn = !whichPlayerTurn; // zmiana tury gracza
             }
             else {
                 whichPlayerTurn = !whichPlayerTurn; // zmiana tury gracza
@@ -125,14 +145,17 @@ public class Kalaha{
         {
             if(potNr(offSet) == secondScorePotOffset) // jesli ostatni kamyk wlecial do scora gracza wykonujacego ruch, powtarza on ruch
             {
-                whichPlayerTurn = whichPlayerTurn;
+                whichPlayerTurn = whichPlayerTurn; //tura pozostaje tego samego gracza
             }
             else if(potNr(offSet) > this.sizeOfPlayerBoard && board[potNr(offSet)] == 1) //oprogramowanie zbicia dla drugiego gracza
             {
                 int otherSidePitHole = kalahaBoardSize - 2 - potNr(offSet);
                 int temp = board[otherSidePitHole];
                 board[otherSidePitHole] = 0;
-                board[secondScorePotOffset] = temp;
+                board[secondScorePotOffset] += temp;
+                board[secondScorePotOffset] += board[potNr(offSet)];
+                board[potNr(offSet)] = 0;
+                whichPlayerTurn = !whichPlayerTurn; // zmiana tury gracza
             }
             else {
                 whichPlayerTurn = !whichPlayerTurn; // zmiana tury gracza
@@ -157,6 +180,12 @@ public class Kalaha{
             {
                 if(board[i] != 0) isFinish = false;
             }
+        }
+
+
+        if(isFinish)
+        {
+            finishGame();
         }
 
         return isFinish;

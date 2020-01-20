@@ -1,5 +1,6 @@
 package KalahaGame;
 
+import AlgorithmsAI.DesiciveTree;
 import Constants.Constants;
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,14 +18,16 @@ public class PlayerAI {
 
     private int makeBestMove(Kalaha currentState)
     {
+        whichPlayer = currentState.isWhichPlayerTurn();
         kalahaGame = currentState.copyKalaha();
 
-        int bestScore = 0;
+        int bestScore = -9999;
         int move = random.nextInt(currentState.getSizeOfPlayerBoard());
 
         for(int i=0; i < currentState.getSizeOfPlayerBoard(); i++)
         {
-            if( !(kalahaGame.makeMove(i) != Constants.NO_ERROR)) {
+            int help = kalahaGame.makeMove(i);
+            if(help != Constants.ERROR) {
 
             int currentScore;
 
@@ -50,6 +53,15 @@ public class PlayerAI {
     }
     public int playerTurn(Kalaha currentState)
     {
-        return makeBestMove(currentState);
+        int move = 0;
+        DesiciveTree dt = new DesiciveTree(currentState);
+        dt.createTree(10);
+        if(currentState.checkIfMoveIsValid(dt.bestMoveDepthSearch(dt.getRoot(), currentState.isWhichPlayerTurn())) != Constants.ERROR)
+        {
+            dt.bestMoveDepthSearch(dt.getRoot(), currentState.isWhichPlayerTurn());
+        }
+        else move = makeBestMove(currentState);
+        return move;
+        //return makeBestMove(currentState);
     }
 }

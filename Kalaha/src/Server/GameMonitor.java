@@ -5,16 +5,16 @@ import GUI.KalahaGUI;
 import KalahaGame.Kalaha;
 import KalahaGame.PlayerAI;
 
+import java.util.Scanner;
+
 public class GameMonitor {
 
 
-    public void startGame()
+    public void startAIvsAIGame(int kalahaBoardSize, int startingValues)
     {
         PlayerAI player1 = new PlayerAI(Constants.FIRST_PLAYER_TURN);
         PlayerAI player2 = new PlayerAI(Constants.SECOND_PLAYER_TURN);
 
-        int kalahaBoardSize = 12;
-        int startingValues = 4;
 
         Kalaha kalaha = new Kalaha();
         kalaha.setEverything(kalahaBoardSize, startingValues);
@@ -25,13 +25,13 @@ public class GameMonitor {
             System.out.print("Gracz ");
             if(kalaha.isWhichPlayerTurn() == Constants.FIRST_PLAYER_TURN)
             {
-                move = player1.playerTurn(kalaha);
+                move = player1.playerTurn(kalaha.copyKalaha());
                 kalaha.makeMove(move);
                 System.out.print(" 1 ");
             }
             else
             {
-                move = player2.playerTurn(kalaha);
+                move = player2.playerTurn(kalaha.copyKalaha());
                 kalaha.makeMove(move);
                 System.out.print(" 2 ");
             }
@@ -40,5 +40,42 @@ public class GameMonitor {
 
             KalahaGUI.printGUI(kalaha);
         }
+        System.out.println("KONIEC GRY");
+        KalahaGUI.printGUI(kalaha);
+    }
+
+    public void startPlayerVsAiGame(int kalahaBoardSize, int startingValues)
+    {
+        PlayerAI player2 = new PlayerAI(Constants.SECOND_PLAYER_TURN);
+
+        Kalaha kalaha = new Kalaha();
+        kalaha.setEverything(kalahaBoardSize, startingValues);
+        Scanner sc = new Scanner(System.in);
+        int move = 0;
+        int nrPlayer = 0;
+
+        KalahaGUI.printGUI(kalaha);
+
+        while(!kalaha.isFinished())
+        {
+            if(kalaha.isWhichPlayerTurn() == Constants.FIRST_PLAYER_TURN)
+            {
+                System.out.println("Twój ruch: ");
+                move = Integer.parseInt(sc.nextLine());
+                kalaha.makeMove(move);
+                nrPlayer = 1;
+            }
+            else
+            {
+                move = player2.playerTurn(kalaha);
+                kalaha.makeMove(move);
+                nrPlayer = 2;
+            }
+
+            KalahaGUI.printGUI(kalaha);
+            System.out.println("Gracz " + nrPlayer + " wykonał ruch " + move);
+        }
+        System.out.println("KONIEC GRY");
+        KalahaGUI.printGUI(kalaha);
     }
 }
