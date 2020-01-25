@@ -9,5 +9,7 @@ public class Constants {
     public static final int FIRST_PLAYER_WON = 100;
     public static final int DRAW = 150;
     public static final int SECOND_PLAYER_WON = 200;
+    public static final boolean MAX = true;
+    public static final boolean MIN = false;
 
 }

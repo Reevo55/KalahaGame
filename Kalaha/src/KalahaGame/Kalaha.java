@@ -17,7 +17,7 @@ public class Kalaha{
     // Drugi gracz ma dolki od 6 do 10
     // Zakladajac ze gramy z 5 dolkami po kazdej stronie
 
-    public Kalaha(){ }
+    public Kalaha(){}
 
     public int setEverything(int kalahaBoardSize, int startingValues)
     {
@@ -41,20 +41,18 @@ public class Kalaha{
 
     public int makeMove(int offSet)
     {
-        if(offSet < 0 || offSet > this.sizeOfPlayerBoard) return Constants.ERROR; // sprawdzenie czy nie błedne
+        if(checkIfMoveIsValid(offSet) == Constants.ERROR) return Constants.ERROR;
 
-        if(whichPlayerTurn == Constants.FIRST_PLAYER_TURN)
-            offSet = offSet; // offset pozostaje taki sam
-        else offSet = offSet + this.sizeOfPlayerBoard + 1; // Ustawia move na planszy drugiego gracza
-
-        if(isFinished()) return finishGame();
-
-        if(board[offSet] == 0 || isItPointPit(offSet)) return Constants.ERROR; // kolejne sprawdzenie
+        if (whichPlayerTurn == Constants.SECOND_PLAYER_TURN) {
+            offSet += this.sizeOfPlayerBoard+1;
+        }
 
         int rocks = board[potNr(offSet)]; // pobranie liczby kamieni z dołka
         board[potNr(offSet)] = 0; // dziura z której zabieramy jest zerowana
 
-        return disposeRocks(rocks, offSet + 1); // przyporządkowanie kamieni
+        disposeRocks(rocks, offSet + 1); // przyporządkowanie kamieni
+
+        return Constants.NO_ERROR;
     }
     public int checkIfMoveIsValid(int offSet)
     {

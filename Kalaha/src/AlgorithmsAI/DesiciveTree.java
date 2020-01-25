@@ -21,7 +21,7 @@ public class DesiciveTree {
     }
 
 
-    public void createTree(int depth)
+   public void createTree(int depth)
     {
         ArrayList<Node> arrNodes = new ArrayList<>(startingState.getKalahaBoardSize());
         for(int i=0 ; i < startingState.getSizeOfPlayerBoard(); i++){arrNodes.add(null);}
@@ -39,7 +39,8 @@ public class DesiciveTree {
                 for(int j=0 ; j < startingState.getSizeOfPlayerBoard(); j++){arrNodes.add(null);}
 
                 Kalaha kalahaCurrent = parent.getCurrentState().copyKalaha();
-                if(kalahaCurrent.makeMove(i) == Constants.ERROR) return;
+                if(kalahaCurrent.checkIfMoveIsValid(i) == Constants.ERROR) return;
+                else kalahaCurrent.makeMove(i);
 
                 Node node = new Node(kalahaCurrent.getFirstPlayerPoints() - kalahaCurrent.getSecondPlayerPoints(), kalahaCurrent, arrNodes);
 
@@ -49,32 +50,53 @@ public class DesiciveTree {
             }
         }
     }
+   /*
+   public void createTree(int depth)
+   {
+       root = new Node(startingState.getFirstPlayerPoints() - startingState.getSecondPlayerPoints(), 0, startingState.copyKalaha(), null);
 
+       fillTree(root, 4);
+   }
+
+    private void fillTree(Node current, int depth)
+    {
+        if(depth > 0) {
+            ArrayList<Node> children = new ArrayList<Node>();
+            for (int i = 0; current.getCurrentState().getSizeOfPlayerBoard() > i; i++) {
+
+                if(current.getCurrentState().checkIfMoveIsValid(i) == Constants.NO_ERROR)
+                {
+                    Kalaha help = current.getCurrentState().copyKalaha();
+                    help.makeMove(i);
+                    children.add(new Node(current.getPoints(), i, help, null));
+                    fillTree(children.get(children.size()-1), depth-1);
+                }
+
+            }
+            current.setNextMoves(children);
+        }
+    } */
     public int bestMoveDepthSearch(Node node, boolean whichPlayer)
     {
         ArrayList<Integer> sumPointsMoves = new ArrayList<>();
-
-        for(int i=0; i < node.getCurrentState().getSizeOfPlayerBoard(); i++)
+        for(int i=0; i < node.getNextMoves().size(); i++)
         {
-            if(node.getNextMoves().get(i) != null) sumPointsMoves.add(depth(node.getNextMoves().get(i)));
+            sumPointsMoves.add(depth(node.nextMoves.get(i)));
         }
-
-        int move = getIndexOfLargest(sumPointsMoves);
-
-        return move;
+        return getIndexOfLargest(sumPointsMoves);
     }
 
     private int depth(Node currentNode)
     {
         int max = 0;
-
-        for(int i=0; i < currentNode.getNextMoves().size(); i++) {
-            int points = currentNode.getPoints();
-            if(currentNode.getNextMoves().get(i) != null) {
-                max += points + depth(currentNode.getNextMoves().get(i));
-            } else max += points;
+        if(currentNode.getNextMoves() != null) {
+            for (int i = 0; i < currentNode.getNextMoves().size(); i++) {
+                int points = currentNode.getPoints();
+                if (currentNode.getNextMoves().get(i) != null) {
+                    max += points + depth(currentNode.getNextMoves().get(i));
+                } else max += points;
+            }
         }
-
         return max;
     }
 
@@ -125,41 +147,44 @@ public class DesiciveTree {
     public void setWhichPlayer(boolean whichPlayer) {
         this.whichPlayer = whichPlayer;
     }
-}
 
-class Node{
 
-    private int points;
-    private Kalaha currentState;
-    private ArrayList<Node> nextMoves;
+    class Node{
 
-    public Node(int points, Kalaha currentState, ArrayList<Node> nextMoves) {
-        this.points = points;
-        this.currentState = currentState;
-        this.nextMoves = nextMoves;
+        private int points;
+        private Kalaha currentState;
+        private ArrayList<Node> nextMoves;
+
+
+        public Node(int points, Kalaha currentState, ArrayList<Node> nextMoves) {
+            this.points = points;
+            this.currentState = currentState;
+            this.nextMoves = nextMoves;
+        }
+
+        public int getPoints() {
+            return points;
+        }
+
+        public void setPoints(int points) {
+            this.points = points;
+        }
+
+        public Kalaha getCurrentState() {
+            return currentState;
+        }
+
+        public void setCurrentState(Kalaha currentState) {
+            this.currentState = currentState;
+        }
+
+        public ArrayList<Node> getNextMoves() {
+            return nextMoves;
+        }
+
+        public void setNextMoves(ArrayList<Node> nextMoves) {
+            this.nextMoves = nextMoves;
+        }
     }
 
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public Kalaha getCurrentState() {
-        return currentState;
-    }
-
-    public void setCurrentState(Kalaha currentState) {
-        this.currentState = currentState;
-    }
-
-    public ArrayList<Node> getNextMoves() {
-        return nextMoves;
-    }
-
-    public void setNextMoves(ArrayList<Node> nextMoves) {
-        this.nextMoves = nextMoves;
-    }
 }

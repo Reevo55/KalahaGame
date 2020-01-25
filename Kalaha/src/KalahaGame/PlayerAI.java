@@ -1,16 +1,18 @@
 package KalahaGame;
 
 import AlgorithmsAI.DesiciveTree;
+import AlgorithmsAI.MiniMaxTree;
 import Constants.Constants;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class PlayerAI {
+public class PlayerAI implements KalahaPlayer{
 
     private Kalaha kalahaGame;
     private Random random = new Random();
     private boolean whichPlayer;
 
+    public PlayerAI(){};
     public PlayerAI(boolean whichPlayer)
     {
         this.whichPlayer = whichPlayer;
@@ -51,17 +53,16 @@ public class PlayerAI {
         }
         return move;
     }
+    @Override
     public int playerTurn(Kalaha currentState)
     {
-        int move = 0;
-        DesiciveTree dt = new DesiciveTree(currentState);
-        dt.createTree(10);
-        if(currentState.checkIfMoveIsValid(dt.bestMoveDepthSearch(dt.getRoot(), currentState.isWhichPlayerTurn())) != Constants.ERROR)
-        {
-            dt.bestMoveDepthSearch(dt.getRoot(), currentState.isWhichPlayerTurn());
-        }
-        else move = makeBestMove(currentState);
-        return move;
+        MiniMaxTree miniMaxTree = new MiniMaxTree();
+        int depth = 5;
+        miniMaxTree.createTree(depth, currentState);
+
+        return miniMaxTree.calculateMove(miniMaxTree.getRoot(), depth);
         //return makeBestMove(currentState);
     }
+
+
 }
